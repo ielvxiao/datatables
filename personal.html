@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	class="no-js">
+<head>
+    <meta charset="UTF-8">
+    <title>个人工作</title>
+<link rel="stylesheet" href="css/reset.css" th:href="@{/css/reset.css}"></link>
+<link rel="stylesheet" href="css/ui.css" th:href="@{/css/ui.css}"></link>
+<link rel="stylesheet" href="css/bootstrap.min.css"
+	th:href="@{/css/bootstrap.min.css}"></link>
+<link rel="stylesheet" href="fonts/iconfont.css"
+	th:href="@{/fonts/iconfont.css}"></link>
+<link rel="stylesheet" href="css/css.css" th:href="@{/css/css.css}"></link>
+<link rel="stylesheet" href="css/datepicker.css"
+	th:href="@{/css/datepicker.css}"></link>
+<link rel="stylesheet" th:href="@{/css/table.css}"></link>
+<link rel="stylesheet" th:href="@{/css/font.css}"></link>
+<style>
+.dataTables_wrapper .dataTables_filter {
+	display: none;
+}
+</style>
+</head>
+<body>
+	<div class="page-wrapper">
+			<div class="table-control" Style="margin-top:20px; ">
+				<form class="form-inline">
+				  <div class="form-group">
+				    <label for="exampleInputEmail2">检查时间</label>
+				    <input type="text" class="form-control datepicker start" id="time_start"></input>
+				  </div>
+				  <div class="form-group">
+				    <label for="exampleInputEmail2">至</label>
+				    <input type="text" class="form-control datepicker end" id="time_end"></input>
+				  </div>
+				<div class="form-group">
+					<label for="exampleInputEmail2">处理人：</label> <input type="text"
+						class="form-control" id="search" placeholder="可选填"></input>
+				</div>
+				<button type="button" class="btn btn-primary" id="btn-search">查
+					询</button>
+				</form>
+			</div>
+
+
+		
+
+		<div class="table-wrap" id="table-wrap" >
+			<table class="table table-bordered table-striped" width="100%"
+				id="netward_table">
+				<thead>
+					<tr>
+						<th>处理人</th>
+						<th>设置涉密文件数</th>
+						<th>设置非涉密文件数</th>
+						<th>删除文件数</th>
+					</tr>
+				</thead>
+				<tbody>
+
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+
+
+
+	<script src="js/jquery.min.js" th:src="@{/js/jquery.min.js}"></script>
+	<script src="js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}"></script>
+	<script src="js/bootstrap-datepicker.js"
+		th:src="@{/js/bootstrap-datepicker.js}"></script>
+	<script src="js/http.js" th:src="@{/js/http.js}"></script>
+	<script th:src="@{/js/jquery.dataTables.min.js}"></script>
+</body>
+</html>
+<script>
+$(function(){
+	info();
+	var startCheckin = $('.datepicker.start').datepicker({format:'yyyy-mm-dd'}).on('changeDate', function(ev) {
+        startCheckin.hide(); }).on('show',function(ev){endCheckin.hide();}).data('datepicker');
+  
+var endCheckin = $('.datepicker.end').datepicker({format:'yyyy-mm-dd'}).on('changeDate', function(ev) {
+        endCheckin.hide();
+    }).on('show',function(ev){startCheckin.hide();}).data('datepicker');
+});
+
+function info() {
+	$('#netward_table')
+			.dataTable(
+						{
+						"processing" : true,
+						"serverSide" :true,
+						"ajax" : {
+							"url" : "reportpersonal",
+							 data: function(d){
+								d.startTime=$('#time_start').val();
+								d.endTime=$('#time_end').val();
+								d.name=$('#search').val();
+							}
+
+						},
+						"columns" : [
+								
+								{
+									"data" : "username"
+								},
+								{
+									"data" : "sm"
+								},
+								{
+									"data" : "fsm"
+								},
+								{
+									"data" : "del"
+								} ],
+						
+						language : {
+							"sProcessing" : "处理中...",
+							"sLengthMenu" : "显示 _MENU_ 项结果",
+							"sZeroRecords" : "没有匹配结果",
+							"sInfo" : "从 _START_ 到 _END_ /共 _TOTAL_ 条数据",
+							"sInfoEmpty" : "显示第 0 至 0 项结果，共 0 项",
+							"sInfoFiltered" : "(由 _MAX_ 项结果过滤)",
+							"sInfoPostFix" : "",
+							"sSearch" : "搜索:",
+							"sUrl" : "",
+							"sEmptyTable" : "表中数据为空",
+							"sLoadingRecords" : "载入中...",
+							"sInfoThousands" : ",",
+							"oPaginate" : {
+								"sFirst" : "首页",
+								"sPrevious" : "上页",
+								"sNext" : "下页",
+								"sLast" : "末页"
+							},
+							"oAria" : {
+								"sSortAscending" : ": 以升序排列此列",
+								"sSortDescending" : ": 以降序排列此列"
+							}
+						},
+						"columnDefs" : [ {
+							orderable : false,
+
+							targets : 0
+						},
+
+						],//第一列与第二列禁止排序
+					});
+}
+//条件查询
+$('#btn-search').click(
+		function() {
+			var table = $('#netward_table').DataTable();
+			table.ajax.reload();
+		});
+</script>
