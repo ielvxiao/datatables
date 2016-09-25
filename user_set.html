@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	class="no-js">
+<head>
+<meta charset="UTF-8"></meta>
+<meta name="_csrf" content="${_csrf.token}" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" content="${_csrf.headerName}" th:content="${_csrf.headerName}"/>
+<title>文档操作安全审计报警信息系统</title>
+<link rel="stylesheet" href="css/reset.css" th:href="@{/css/reset.css}"></link>
+<link rel="stylesheet" href="css/ui.css" th:href="@{/css/ui.css}"></link>
+<link rel="stylesheet" href="css/bootstrap.min.css"
+	th:href="@{/css/bootstrap.min.css}"></link>
+<link rel="stylesheet" href="fonts/iconfont.css"
+	th:href="@{/fonts/iconfont.css}"></link>
+<link rel="stylesheet" href="css/css.css" th:href="@{/css/css.css}"></link>
+<link rel="stylesheet" href="css/datepicker.css"
+	th:href="@{/css/datepicker.css}"></link>
+
+<link rel="stylesheet" th:href="@{/css/table.css}"></link>
+<link rel="stylesheet" th:href="@{/css/font.css}"></link>
+</head>
+<body >
+<ol class="breadcrumb">
+	<li><a href="../map/map"><span class="glyphicon glyphicon-home"></span> 主页</a></li>
+	<li><a href="#">系统管理</a></li>
+	<li class="active">用户管理</li>
+</ol>
+	<div class="table-wrap" id="table-wrap">
+		<button type="button" class="btn btn-success btn-sm" id="btn-add"
+			data-toggle="modal" data-target="#addModal"><span class="glyphicon glyphicon-plus"></span>添加</button>
+
+		<div class="table-control"></div>
+		<table id="example" class="table table-bordered hover" width="100%">
+			<thead>
+				<tr>
+
+					<th>序号</th>
+					<th>姓名</th>
+					<th>登录名</th>
+					<th>邮箱地址</th>
+					<th>电话号码</th>
+					<th>拥有角色</th>
+					<th width="360">操作</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+	<script src="js/jquery.min.js" th:src="@{/js/jquery.min.js}"></script>
+	<script src="js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}"></script>
+	<script src="js/bootstrap.min.js"
+		th:src="@{/js/jquery.dataTables.min.js}"></script>
+	<script src="js/bootstrap.min.js" th:src="@{/js/checkall.jquery.js}"></script>
+	<script th:src="@{/js/http.js}"></script>
+
+	<!-- 新增功能模态框（Modal） -->
+	<div class="modal fade" id="addModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">×</button>
+					<h4 class="modal-title" id="myModalLabel">添加管理员</h4>
+				</div>
+				<div class="modal-body">
+					<form>
+						<div class="form-group">
+							<label>登录名：</label> <input type="text" class="form-control"
+								id="addusername" placeholder="请输入用户名" />
+						</div>
+						<div class="form-group">
+							<label>姓名：</label> <input type="text" class="form-control"
+								id="addname" placeholder="请输入真实姓名" />
+						</div>
+						<div class="form-group">
+							<label>密码：</label> <input type="password" class="form-control"
+								id="addpassword" placeholder="请输入密码" />
+						</div>
+						<div class="form-group">
+							<label>电话：</label> <input type="text" class="form-control"
+								id="addtelephone" placeholder="请输入电话号码" />
+						</div>
+						<div class="form-group">
+							<label>邮箱：</label> <input type="text" class="form-control"
+								id="addemail" placeholder="请输入邮箱地址" />
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal" id="adddissmiss">关闭
+					</button>
+					<button type="button" class="btn btn-primary" id="addsubmit">
+						提交更改</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+
+
+	<!-- 修改模态框（Modal） -->
+	<div class="modal fade" id="fixModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">×</button>
+					<h4 class="modal-title" id="myModalLabel">修改管理员</h4>
+				</div>
+				<div class="modal-body">
+					<form>
+						<div class="form-group" hidden="hidden">
+							<label>id：</label> <input type="text" class="form-control"
+								id="id1" placeholder="请输入用户名" />
+						</div>
+						<div class="form-group">
+							<label>登录名：</label> <input type="text" class="form-control"
+								id="addusername1" placeholder="请输入用户名" disabled="disabled" />
+						</div>
+						<div class="form-group">
+							<label>姓名：</label> <input type="text" class="form-control"
+								id="addname1" placeholder="请输入真实姓名" />
+						</div>
+						
+						<div class="form-group">
+							<label>电话：</label> <input type="text" class="form-control"
+								id="addtelephone1" placeholder="请输入电话号码" />
+						</div>
+						<div class="form-group">
+							<label>邮箱：</label> <input type="text" class="form-control"
+								id="addemail1" placeholder="请输入邮箱地址" />
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal" >关闭
+					</button>
+					<button type="button" class="btn btn-primary" id="fixsubmit">
+						提交更改</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+<!-- 删除 -->
+<div class="modal fade" id="deleteModal">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">提示信息</h4>
+            </div>
+            <div class="modal-body" id="modalbody">
+                <p  id="modalp" style="color:red;font-size:30px;font-size:15px;">确认删除该信息？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="deletedismiss">取消</button>
+                <button type="button" class="btn btn-primary" id="deleteconfirm">确认</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- 修改模态框（Modal） -->
+	<div class="modal fade" id="roleModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-hidden="true">×</button>
+					<h4 class="modal-title" id="myModalLabel">角色管理</h4>
+				</div>
+				<div class="modal-body">
+					<input type="hidden" id="user_id"></input>
+				     <div class="modal-body" id="rolelists">
+		            </div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal" >关闭
+					</button>
+					<button type="button" class="btn btn-primary" id="rolessubmit">
+						提交更改</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+</body>
+</html>
+<script>
+
+var header = $("meta[name='_csrf_header']").attr("content");
+var token = $("meta[name='_csrf']").attr("content");
+
+	function info() {
+		$('#example')
+				.dataTable(
+
+						{
+
+							"searching" : true,
+							"processing" : true,
+							"ajax" : {
+								"url" : "../usermanage/getUserBySql",
+								"dataSrc" : ""
+							},
+							"columns" : [
+									{
+										"data" : null,"targets": 0
+									},
+									{
+										"data" : "user_name"
+									},
+									{
+										"data" : "login_name"
+									},
+									{
+										"data" : "email"
+									},
+									{
+										"data" : "telephone"
+									},
+									{
+										"data" : null,
+										"render" : function(data, type, row, meta) {
+											var roles = row.roles;
+											var str = "";
+											for (x in roles)
+											  {
+												
+												str=str + "<span class=\"label label-info\">"+roles[x]+"</span>  ";
+											  }
+											return str;
+										}
+									},
+									{
+										"data" : null,
+										"render" : function(data, type, row,
+												meta) {
+											var roles = row.roles;
+											return '<button type="button" class="btn btn-primary btn-sm" onclick= "edit('
+													+ row.id
+													+ ',\''
+													+ row.user_name
+													+ '\',\''
+													+ row.login_name
+													+ '\',\''
+													+ row.email
+													+ '\',\''
+													+ row.telephone
+													+ '\')" data-toggle="modal" data-target="#fixModal"><span class="glyphicon glyphicon-pencil"></span>&nbsp;&nbsp;编辑&nbsp;&nbsp;</button>  <button type="button" class="btn btn-danger btn-sm" onclick="deleteuser('
+													+ row.id + ')"><span class="glyphicon glyphicon-remove"></span>&nbsp;&nbsp;删除&nbsp;&nbsp;</button>  <button type="button" class="btn btn-warning btn-sm" onclick="editRole('
+													+ row.id + ')"><span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;角色管理&nbsp;&nbsp;</button>  <button class="btn btn-default btn-sm" onclick="repass('+row.id+')">&nbsp;&nbsp;重置密码&nbsp;&nbsp;</button>';
+										}
+									} ],
+
+							language : {
+								"sProcessing" : "处理中...",
+								"sLengthMenu" : "显示 _MENU_ 项结果",
+								"sZeroRecords" : "没有匹配结果",
+								"sInfo" : "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+								"sInfoEmpty" : "显示第 0 至 0 项结果，共 0 项",
+								"sInfoFiltered" : "(由 _MAX_ 项结果过滤)",
+								"sInfoPostFix" : "",
+								"sSearch" : "搜索:",
+								"sUrl" : "",
+								"sEmptyTable" : "表中数据为空",
+								"sLoadingRecords" : "载入中...",
+								"sInfoThousands" : ",",
+								"oPaginate" : {
+									"sFirst" : "首页",
+									"sPrevious" : "上页",
+									"sNext" : "下页",
+									"sLast" : "末页"
+								},
+								"oAria" : {
+									"sSortAscending" : ": 以升序排列此列",
+									"sSortDescending" : ": 以降序排列此列"
+								}
+							},
+							"fnDrawCallback": function(){
+								　　var api = this.api();
+								　　//var startIndex= api.context[0]._iDisplayStart;//获取到本页开始的条数
+								　　api.column(0).nodes().each(function(cell, i) {
+
+								　　　　//此处 startIndex + i + 1;会出现翻页序号不连续，主要是因为startIndex 的原因,去掉即可。
+								　　　　//cell.innerHTML = startIndex + i + 1;
+
+								　　　　cell.innerHTML =  i + 1;
+
+								　　}); 
+								}
+						});
+	}
+	$(function() {
+		info();
+		new Checkall('btn-table-checkall', 'checkbox', 'table-wrap');
+		$(document).on("click", "#btn-search", function() {
+			//自己定义的搜索框，可以是时间控件，或者checkbox 等等
+			var args1 = $("#search_user").val();
+			var args2 = $("#search_role").val();
+			var table = $('#example').DataTable();
+			//用空格隔开，达到多条件搜索的效果，相当于两个关键字
+			table.search(args1 + " " + args2).draw();
+			//table.search(args1+" "+args2).draw(false);//保留分页，排序状态
+		});
+
+	});
+	//新增方法
+	$('#addsubmit').click(function() {
+		var addusername = $("#addusername").val();
+		var addname = $("#addname").val();
+		var addpassword = $("#addpassword").val();
+		var addtelephone = $("#addtelephone").val();
+		var addemail = $("#addemail").val();
+		if(addpassword.length<6){
+			document.getElementById("modalp").innerHTML = "密码长度不能少于6位！";
+			
+			 $('#deleteModal').modal();
+			 $('#deleteconfirm').click(function() {
+				 
+					$("#deleteModal").modal('hide');
+			 });
+			 return ;
+		}
+		http_post("../usermanage/createUser", {
+			loginName : addusername,
+			userName : addname,
+			password : addpassword,
+			telephone : addtelephone,
+			email : addemail,
+		},token,header);
+		$("#addModal").modal('hide');
+		var table = $('#example').DataTable();
+		table.ajax.reload();
+		clear();
+	});
+	$('#adddissmiss').click(function(){
+		clear();
+	});
+	
+	function clear(){
+		$("#addusername").val("");
+		$("#addname").val("");
+		$("#addpassword").val("");
+		$("#addtelephone").val("");
+		$("#addemail").val("");
+	}
+	//删除方法
+	function deleteuser(data) {
+		var rs = http_get('../usermanage/deleteUser', {
+			id : data
+		});
+		if(rs.message==0){
+			
+			document.getElementById("modalp").innerHTML = "确认删除该用户？";
+			
+			 $('#deleteModal').modal();
+			 $('#deleteconfirm').click(function() {
+				 
+				 var table = $('#example').DataTable();
+					table.ajax.reload();
+					$("#deleteModal").modal('hide');
+			 });
+		}else if(rs.message==1){
+			
+			 document.getElementById("modalp").innerHTML = "禁止删除管理员！！！";
+			 
+			$('#deleteModal').modal();
+			$('#deleteconfirm').click(function() {
+				 
+				$("#deleteModal").modal('hide');
+		 });
+			
+		}else{
+			document.getElementById("modalp").innerHTML = "删除失败!";
+			
+			$('#deleteModal').modal();
+			$('#deleteconfirm').click(function() {
+				 
+				$("#deleteModal").modal('hide');
+		 });
+		}
+	}
+	
+	//修改方法 
+	function edit(id, user_name, login_name, telephone, email) {
+		$("#id1").val(id);
+		$('#addusername1').val(login_name);
+		$("#addname1").val(user_name);
+		$("#addtelephone1").val(telephone);
+		$("#addemail1").val(email);
+		//修改方法的模态框 
+		$('#fixsubmit').click(function() {
+			var id = $("#id1").val();
+			var addname = $("#addname1").val();
+			
+			var addtelephone = $("#addtelephone1").val();
+			var addemail = $("#addemail1").val();
+			http_post("../usermanage/fixUser", {
+				id : id,
+				loginName : addusername,
+				userName : addname,
+				telephone : addtelephone,
+				email : addemail,
+			},token,header);
+			$("#fixModal").modal('hide');
+			var table = $('#example').DataTable();
+			table.ajax.reload();
+		});
+	}
+	
+	function editRole(id) {
+		var rs = http_get("../rolemanage/getRoleBySql","");
+		var rs1 = http_get("../usermanage/getUserRoles",{userid:id});
+		$("#user_id").val(id);
+		var html = "";
+		for(x in rs){
+			var role = rs[x];
+			if(x % 3== 0){
+				html+="<div class='row' style='margin-bottom: 10px;'>";
+				html += "<div class='col-md-4'><input type=\"checkbox\" name=\""+role.name+"\" value=\""+role.id+"\">  <span class=\"label label-info\">"+role.name+"</span></div>   " ;
+			}else if(x%3==1){
+				html += "<div class='col-md-4'><input type=\"checkbox\" name=\""+role.name+"\" value=\""+role.id+"\">  <span class=\"label label-info\">"+role.name+"</span></div>   " ;
+			}else{
+				html += "<div class='col-md-4'><input type=\"checkbox\" name=\""+role.name+"\" value=\""+role.id+"\">  <span class=\"label label-info\">"+role.name+"</span></div></div>   " ;
+			}
+			
+		}
+		var divshow = $("#rolelists");
+        divshow.text("");// 清空数据
+        divshow.append(html); //
+		
+		for(i in rs1){
+			$('input[name='+rs1[i].name+']').attr('checked',true);
+		}
+		$("#roleModal").modal();
+		
+	}
+	//权限修改
+	$('#rolessubmit').click(function() {
+		var chk_value =[];
+		var user_id = $("#user_id").val();
+		$(':checkbox:checked').each(function(){ 
+			chk_value.push($(this).val()); 
+		}); 
+		var _roles = chk_value.join(",")
+		http_post("../usermanage/updateUserRoles", {
+			roles : _roles,
+			id    : user_id
+		},token,header);
+		
+		$("#roleModal").modal('hide');
+		var table = $('#example').DataTable();
+		table.ajax.reload();
+	});
+	//重置密码
+	function repass(data){
+		http_post("../rePassword",{id : data},token,header);
+		document.getElementById("modalp").innerHTML = "重置成功!";
+		$('#deleteModal').modal();
+		$('#deleteconfirm').click(function() {
+			 
+			$("#deleteModal").modal('hide');
+	 });
+	}
+</script>
